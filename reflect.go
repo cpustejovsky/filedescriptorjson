@@ -1,8 +1,9 @@
-package filedescriptionjson
+package filedescriptorjson
 
 import (
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -25,15 +26,15 @@ func MessageDescriptorFromFileDescriptor(name string, fd protoreflect.FileDescri
 	return md, nil
 }
 
-func FromFileDescriptor(name string, fd protoreflect.FileDescriptor, data []byte) (*dynamicpb.Message, error) {
+func ToJSON(name string, fd protoreflect.FileDescriptor, data []byte) (string, error) {
 	md, err := MessageDescriptorFromFileDescriptor(name, fd, nil)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	msg := dynamicpb.NewMessage(md)
 	err = proto.Unmarshal(data, msg)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return msg, nil
+	return protojson.Format(msg), nil
 }

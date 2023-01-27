@@ -1,4 +1,4 @@
-package filedescriptionjson_test
+package filedescriptorjson_test
 
 import (
 	"github.com/cpustejovsky/filedescriptorjson"
@@ -13,14 +13,14 @@ var protoname = "HelloRequest"
 
 func TestMessageDescriptorFromFileDescriptor(t *testing.T) {
 	fd := helloworld.File_helloworld_helloworld_proto
-	md, err := filedescriptionjson.MessageDescriptorFromFileDescriptor(protoname, fd, nil)
+	md, err := filedescriptorjson.MessageDescriptorFromFileDescriptor(protoname, fd, nil)
 	require.Nil(t, err)
 	require.Equal(t, protoname, string(md.FullName().Name()))
 }
 
 func TestMarshalProtoFromFileDescriptor(t *testing.T) {
 	msg := helloworld.HelloRequest{
-		Name: "Charles",
+		Name: "cpustejovsky",
 	}
 	t.Log("Original Message:\n", protojson.Format(&msg))
 	bin, err := proto.Marshal(&msg)
@@ -30,7 +30,8 @@ func TestMarshalProtoFromFileDescriptor(t *testing.T) {
 	err = proto.Unmarshal(bin, tmp)
 	require.Nil(t, err)
 	require.Equal(t, msg.GetName(), tmp.GetName())
-	newMsg, err := filedescriptionjson.FromFileDescriptor(protoname, fd, bin)
+	newJSONMsg, err := filedescriptorjson.ToJSON(protoname, fd, bin)
 	require.Nil(t, err)
-	t.Log("Message Converted from FileDescriptor:\n", protojson.Format(newMsg))
+	require.NotEmpty(t, newJSONMsg)
+	t.Log("Message Converted from FileDescriptor:\n", newJSONMsg)
 }
